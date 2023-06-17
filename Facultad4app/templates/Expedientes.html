@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	{% load static %}
+	<title>Expediente</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="{% static 'css/main.css' %}">
+	<link rel="stylesheet" href="{% static 'css/main.css' %}">
+	<script src="chrome-extension://mooikfkahbdckldjjndioackbalphokd/assets/prompt.js"></script>
+</head>
+<body>
+	<!-- SideBar -->
+	<section class="full-box cover dashboard-sideBar">
+		<div class="full-box dashboard-sideBar-bg btn-menu-dashboard"></div>
+		<div class="full-box dashboard-sideBar-ct">
+
+					<!--SideBar Title -->
+					<div class="full-box text-uppercase text-center text-titles dashboard-sideBar-title">
+					Facultad 4  <i class="zmdi zmdi-close btn-menu-dashboard visible-xs"></i>
+					</div>
+					<!-- SideBar User info -->
+					<div class="full-box dashboard-sideBar-UserInfo">
+						<figure class="full-box">
+							<img src="{% static 'assets/img/.jpg' %}" alt="UserIcon">
+							<figcaption class="text-center text-titles">{{ user.name }}</figcaption>
+						</figure>
+						<ul class="full-box list-unstyled text-center">
+							<!--<li>
+								<a href="#!">
+									<i class="zmdi zmdi-settings"></i>
+								</a>
+							</li>
+						--><li>
+								<a href="{% url 'Inicio' %}" class="">
+									<i class="zmdi zmdi-power"></i>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<!-- SideBar Menu -->
+					<ul class="list-unstyled full-box dashboard-sideBar-Menu">
+						<li>
+							<a href="{% url 'Inicio' %}">
+								<i class="zmdi zmdi-view-dashboard zmdi-hc-fw"></i> Pagina Principal
+							</a>
+						</li>
+						<li>
+							{% if user.role == 'Secretaria' or user.role == 'Vicedecano' %}
+							<a href="{% url 'Dietas' %}" class="btn-sideBar-SubMenu">
+								<i class="zmdi zmdi-account-add zmdi-hc-fw"></i> Dieta<i class=""></i>
+							</a>
+							{% endif %}
+						</li>
+						<li>
+							{% if user.role == 'Secretaria' or user.role == 'Vicedecano' %}
+							<a href="{% url 'Prestamo' %}" class="btn-sideBar-SubMenu">
+								<i class="zmdi zmdi-case zmdi-hc-fw"></i> Prestamos <i class=""></i>
+							</a>
+							{% endif %}
+						</li>
+						<li>
+							{% if user.role == 'Administrador' %}
+							<a href="{% url 'Usuarios' %}" class="btn-sideBar-SubMenu">
+								<i class="zmdi zmdi-account-add zmdi-hc-fw"></i> Usuarios<i class=""></i>
+							</a>
+							{% endif %}
+
+						</li>
+						<li>
+							{% if user.role == 'Secretaria' or user.role == 'Vicedecano' %}
+							<a href="{% url 'Bonificaciones' %}" class="btn-sideBar-SubMenu">
+								<i class="zmdi zmdi-card zmdi-hc-fw"></i> Bonificaciones <i class=""></i>
+							</a>
+							{% endif %}
+						</li>
+						<li>
+							{% if user.role == 'Secretaria' or user.role == 'Vicedecano' %}
+							<a href="{% url 'Expedientes' %}" class="btn-sideBar-SubMenu">
+								<i class="zmdi zmdi-shield-security zmdi-hc-fw"></i> Expedientes <i class=""></i>
+							</a>
+							{% endif %}
+						</li>
+					</ul>
+				</div>
+			</section>
+
+			<!-- Content page-->
+			<section class="full-box dashboard-contentPage">
+				<!-- NavBar -->
+				<nav class="full-box dashboard-Navbar">
+					<ul class="full-box list-unstyled text-right">
+						<li class="pull-left">
+							<a href="#!" class="btn-menu-dashboard"><i class="zmdi zmdi-more-vert"></i></a>
+						</li>
+						<!--<li>
+							<a href="#!" class="btn-Notifications-area">
+								<i class="zmdi zmdi-notifications-none"></i>
+								<span class="badge">7</span>
+							</a>
+						</li>
+						<li>
+							<a href="#!" class="btn-search">
+								<i class="zmdi zmdi-search"></i>
+							</a>
+						</li>
+						<li>
+							<a href="#!" class="btn-modal-help">
+								<i class="zmdi zmdi-help-outline"></i>
+							</a>
+						</li>
+					-->	</ul>
+				</nav>
+		<!-- Content page -->
+		<div class="container-fluid">
+			<div class="page-header">
+			  <h1 class="text-titles"><i class="zmdi zmdi-balance zmdi-hc-fw"></i> Gestionar Expedientes</h1>
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-xs-12">
+					<ul class="nav nav-tabs" style="margin-bottom: 15px;">
+					  	<li  ><a href="#new" data-toggle="tab">Añadir expediente</a></li>
+					  	<li><a href="#list"  data-toggle="tab">Lista de expedientes</a></li>
+					</ul>
+					<div id="myTabContent" class="tab-content">
+						<div class="tab-pane fade active in  " id="new">
+							<div class="container-fluid">
+								<div class="row">
+									<div class="col-xs-12 col-md-10 col-md-offset-1">
+									    <form action="{% url 'Crear-Expediente' %}" method="POST">
+											{% csrf_token %}
+											{% if messages %}
+												{% for message in messages %}
+													<div {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</div>
+												{% endfor %}
+											{% endif %}
+									    	<div class="form-group label-floating">
+											  <label class="control-label">Nombre</label>
+											  <input class="form-control" name="name" pattern="^[a-zA-Z ]+$" {% if name_f %} value="{{ name_f }}" required {% endif %}  type="text">
+											</div>
+											<div class="form-group label-floating">
+											  <label class="control-label">Apellidos</label>
+											  <input class="form-control" name="lastname" pattern="^[a-zA-Z ]+$" {% if lastname_f %} value="{{ lastname_f }}" required {% endif %} type="text">
+											</div>
+											<div class="form-group label-floating">
+												<label for="prov">Selecciona tu Facultad:</label>
+												<select id="fac" name="fac" {% if fac_f %} value="{{ fac_f }}" required {% endif %}>
+													<option class= "inactive" value="pinar-del-rio">Facultades</option>
+												  <option value="1">Facultad 1</option>
+												  <option value="2">Facultad 2</option>
+												  <option value="3">Facultad 3</option>
+												  <option value="4">Facultad 4</option>
+												  <option value="citec">Citec</option>
+												  <option value="fte">FTE</option>
+											
+												</select>
+											</div>
+											<div class="form-group label-floating">
+											  <label class="control-label">Direccion</label>
+											  <input class="form-control" name= "dir" {% if dir_f %} value="{{ dir_f }}" required {% endif %} type="text">
+											</div>
+											<div class="form-group label-floating">
+											  <label class="control-label">CI</label>
+											  <input class="form-control" id="CI" name="CI" {% if CI_f %} value="{{ CI_f }}" required {% endif %} type="number">
+											</div>
+											
+											<div class="form-group label-floating">
+												<label for="prov">Selecciona tu provincia:</label>
+												<select id="prov" name="prov" {% if prov_f %} value="{{ prov_f }}" required {% endif %} >
+													<option class= "inactive" value="pinar-del-rio">Provincias</option>
+												  <option value="pinar-del-rio">Pinar del Río</option>
+												  <option value="artemisa">Artemisa</option>
+												  <option value="la-habana">La Habana</option>
+												  <option value="mayabeque">Mayabeque</option>
+												  <option value="matanzas">Matanzas</option>
+												  <option value="cienfuegos">Cienfuegos</option>
+												  <option value="villa-clara">Villa Clara</option>
+												  <option value="sancti-spiritus">Sancti Spíritus</option>
+												  <option value="ciego-de-avila">Ciego de Ávila</option>
+												  <option value="camaguey">Camagüey</option>
+												  <option value="las-tunas">Las Tunas</option>
+												  <option value="holguin">Holguín</option>
+												  <option value="granma">Granma</option>
+												  <option value="santiago-de-cuba">Santiago de Cuba</option>
+												  <option value="guantanamo">Guantánamo</option>
+												  <option value="isla-de-la-juventud">Isla de la Juventud</option>
+												</select>
+											</div>
+											<div class="form-group label-floating">
+												<label class="control-label">Municipio</label>
+												<input class="form-control" pattern="^[a-zA-Z ]+$" name="mun" {% if mun_f %} value="{{ mun_f }}" required {% endif %}type="text">
+											  </div>
+											<div class="form-group label-floating">
+											  <label class="control-label">Solapin</label>
+											  <input class="form-control"name="sol" {% if sol_f %} value="{{ sol_f }}" required {% endif %}type="text">
+											</div>
+											<div class="form-group">
+											  <label class="control-label">Fecha de creacion</label>
+											  <input class="form-control" id="fechaC" name="fechaC" {% if fechaC_f %} value="{{ fechaC_f }}" required {% endif %} type="date">
+											</div>
+											<div class="form-group">
+											  <label class="control-label">Fecha de aprobacion</label>
+											  <input class="form-control" id="fechaA" name="fechaA" {% if fechaA_f %} value="{{ fechaA_f }}" required {% endif %} type="date">
+											</div>
+
+										    <p class="text-center">
+										    	<button href="#!" class="btn btn-info btn-raised btn-sm"><i class="zmdi zmdi-floppy"></i> Guardar Expediente</button>
+										    </p>
+									    </form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="tab-pane fade " id="list">
+						
+							{% if messages %}
+								{% for message in messages %}
+									<div {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</div>
+								{% endfor %}
+							{% endif %}
+						<div class="table-responsive">
+							<table class="table table-hover text-center table-lng">
+								<thead>
+									<tr>
+										<th class="text-center">#</th>
+										<th class="text-center">Nombre</th>
+										<th class="text-center">Apellidos</th>
+										<th class="text-center">Facultad</th>
+										<th class="text-center">Direccion</th>
+										<th class="text-center">CI</th>
+										<th class="text-center">Provincia</th>
+										<th class="text-center">Municipio</th>
+										<th class="text-center">Solapin</th>
+										<th class="text-center">Fecha de creacion</th>
+										<th class="text-center">Fecha de aprobacion</th>
+										<th class="text-center">Modificar</th>
+										<th class="text-center">Eliminar</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for expediente in expedientes %}
+											<tr>
+												<td>{{ forloop.counter }}</td>
+												<td>{{ expediente.name }}</td>
+												<td>{{ expediente.lastname }}</td>
+												<td>{{ expediente.fac }}</td>
+												<td>{{ expediente.dir }}</td>
+												<td>{{ expediente.CI }}</td>
+												<td>{{ expediente.prov }}</td>
+												<td>{{ expediente.mun }}</td>
+												<td>{{ expediente.sol }}</td>
+												<td>{{ expediente.fechaC }}</td>
+												<td>{{ expediente.fechaA }}</td>
+												<td><a href="{% url 'editar-expediente' expediente.id %}" class="btn btn-success btn-raised btn-xs"><i class="zmdi zmdi-refresh"></i></a></td>
+												<td><a href="{% url 'delete-expediente' expediente.id %}" onclick="return confirm('Desea eliminar este objeto? Esta operacion no tiene retroceso.')" class="btn btn-danger btn-raised btn-xs"><i class="zmdi zmdi-delete"></i></a></td>
+											</tr>
+										{% endfor %}
+
+								</tbody>
+							</table>
+						</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Notifications area -->
+	<section class="full-box Notifications-area">
+		<div class="full-box Notifications-bg btn-Notifications-area"></div>
+		<div class="full-box Notifications-body">
+			<div class="Notifications-body-title text-titles text-center">
+				Notifications <i class="zmdi zmdi-close btn-Notifications-area"></i>
+			</div>
+			<div class="list-group">
+			  	<div class="list-group-item">
+				    <div class="row-action-primary">
+				      	<i class="zmdi zmdi-alert-triangle"></i>
+				    </div>
+				    <div class="row-content">
+				      	<div class="least-content">17m</div>
+				      	<h4 class="list-group-item-heading">Tile with a label</h4>
+				      	<p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus.</p>
+				    </div>
+			  	</div>
+			  	<div class="list-group-separator"></div>
+			  	<div class="list-group-item">
+				    <div class="row-action-primary">
+				      	<i class="zmdi zmdi-alert-octagon"></i>
+				    </div>
+				    <div class="row-content">
+				      	<div class="least-content">15m</div>
+				      	<h4 class="list-group-item-heading">Tile with a label</h4>
+				      	<p class="list-group-item-text">Donec id elit non mi porta gravida at eget metus.</p>
+				    </div>
+			  	</div>
+			  	<div class="list-group-separator"></div>
+				<div class="list-group-item">
+				    <div class="row-action-primary">
+				      	<i class="zmdi zmdi-help"></i>
+				    </div>
+				    <div class="row-content">
+				      	<div class="least-content">10m</div>
+				      	<h4 class="list-group-item-heading">Tile with a label</h4>
+				      	<p class="list-group-item-text">Maecenas sed diam eget risus varius blandit.</p>
+				    </div>
+				</div>
+			  	<div class="list-group-separator"></div>
+			  	<div class="list-group-item">
+				    <div class="row-action-primary">
+				      	<i class="zmdi zmdi-info"></i>
+				    </div>
+				    <div class="row-content">
+				      	<div class="least-content">8m</div>
+				      	<h4 class="list-group-item-heading">Tile with a label</h4>
+				      	<p class="list-group-item-text">Maecenas sed diam eget risus varius blandit.</p>
+				    </div>
+			  	</div>
+			</div>
+
+		</div>
+	</section>
+
+	<!-- Dialog help -->
+	<div class="modal fade" tabindex="-1" role="dialog" id="Dialog-Help">
+	  	<div class="modal-dialog" role="document">
+		    <div class="modal-content">
+			    <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			    	<h4 class="modal-title">Help</h4>
+			    </div>
+			    <div class="modal-body">
+			        <p>
+			        	Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt beatae esse velit ipsa sunt incidunt aut voluptas, nihil reiciendis maiores eaque hic vitae saepe voluptatibus. Ratione veritatis a unde autem!
+			        </p>
+			    </div>
+		      	<div class="modal-footer">
+		        	<button type="button" class="btn btn-primary btn-raised" data-dismiss="modal"><i class="zmdi zmdi-thumb-up"></i> Ok</button>
+		      	</div>
+		    </div>
+	  	</div>
+	</div>
+	<!--====== Scripts -->
+	<script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+	<script src="{% static 'js/sweetalert2.min.js' %}"></script>
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script src="{% static 'js/material.min.js' %}"></script>
+	<script src="{% static 'js/ripples.min.js' %}"></script>
+	<script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+	<script src="{% static 'js/main.js' %}"></script>
+	<script src="{% static 'plugins/datatables/datatables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/datatables/js/dataTables.bootstrap4.min.js' %}"></script>
+	<script>
+		$.material.init();
+	</script>
+	<script>
+        $(document).ready(function(e){
+            if($('.alert-lng').length){
+                setTimeout(() => {
+                    $('.alert-lng').remove();
+                }, 6000);
+            }
+			if($('#fechaC').length > 0 && $('#fechaA').length > 0) {
+				$('#fechaA').change(function(e){
+					if($('#fechaC').val() > $(this).val() && $('#fechaC').val() != ''){
+						alert('La fecha de fin debe ser superior a la de inicio');
+						$(this).val('');
+					}
+				})
+				$('#fechaC').change(function(e){
+					if($('#fechaA').val() < $(this).val() && $('#fechaA').val() != ''){
+						alert('La fecha de fin debe ser mayor a la de inicio');
+						$(this).val('');
+					}
+				})
+			}
+			if($('#ci').length > 0) {
+				$('#ci').change(function(e){
+					if($('#ci').val().length != 11) {
+						alert('El carnet debe tener 11 digitos');
+						$('#ci').val('');
+					}
+				})
+			}
+
+            if($('.table-lng').length){
+                $('.table-lng').DataTable({"columnDefs": [{ targets: 'no-sort', orderable: false }],"language": {"url": "{% static 'plugins/datatables/Spanish.json' %}"}});
+            }
+        });
+    </script>
+</body>
+</html>
